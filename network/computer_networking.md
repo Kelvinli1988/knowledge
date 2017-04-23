@@ -12,6 +12,8 @@ IP service model is a best-effort delivery service.
 
 ### Feature of UDP
 
+![UDP Segment Structure](images/udp_segment_structure.jpg)
+
 - Finner application-level control over what data is sent and when.  
 - No connection establishment.
 - No connection state.
@@ -46,4 +48,8 @@ IP service model is a best-effort delivery service.
 
 #### Window, pipelining
 - The sender may be restricted to sending only packets with sequence number that fall within a given range. By allowing multiple packets to be transmitted by not yet ackowledged, sender utilization can be increated over a stop and wait mode of operation. We will see shortly that the window size may be set on the basis of the receiver's ability to receive and buffer messages, or the level of congestion in the network or both.
+
+## TCP
+
+![TCP Segment Structure](images/tcp_segment_structure.jpg)
 
