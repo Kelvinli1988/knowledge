@@ -80,3 +80,5 @@ IP service model is a best-effort delivery service.
     - Set the acknowledgement field to client_isn + 1.
     - Randomize a sequencenumber.
 - Step 3: Client receives the SYN ACK segment, allocates buffers and variables to the connection.
+
+#### Close a connection
