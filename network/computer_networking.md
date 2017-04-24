@@ -51,5 +51,32 @@ IP service model is a best-effort delivery service.
 
 ## TCP
 
+### Important parameters
+- MSS - Maximum segment size
+- MTU - Maximum transmission unit
+
 ![TCP Segment Structure](images/tcp_segment_structure.jpg)
 
+- 32-bit sequence number field and 32-bit acknowledgement number field. 
+    - For reliable data transfer service.
+- 16-bit receive window, for flow control.
+- 4-bit header length field
+- Optional and variable-length options fields
+    - Used when a sender and receiver negotiate the MSS 
+    - As a window scaling factor for use in high-speed networks.
+- Flag fields
+    - ACK bit: indicate that the value carried in the acknowledgement field is valid, that is, the segment contains an acknowledgement for a segment that has been succesfully received.
+    - RST, SYN, FIN: connection setup.
+    - PSH: the receiver should pass the data to the upper layer immediately.
+    - URG: data in the segment that the sending-side upper-layer entity has marked as "urgent". 
+
+### TCP Connection Management
+
+#### Establish a connection.
+![TCP Three Way Handshake](images/TCP_three_way_handshake.jpg)
+- Step 1: Client sends a special segment to server with SYN set to 1, and randomizing the client_isn.
+- Step 2: Server receives the SYN segment, allocates the TCP buffers and variables to the connection and send a connection-granted segment to client.
+    - Set SYN to 1.
+    - Set the acknowledgement field to client_isn + 1.
+    - Randomize a sequencenumber.
+- Step 3: Client receives the SYN ACK segment, allocates buffers and variables to the connection.
