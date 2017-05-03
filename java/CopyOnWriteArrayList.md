@@ -15,7 +15,9 @@ It is oridinaryly too costly, but be more efficient in the following case:
 All elements are permited including null.
 
 ## Concurrency model
-Memory concurrency effects: As with other concurrent collections, actions in a thread prior to placing an object into a CopyOnWriteArrayList happen-before actions subsequent to the access or removal of that element from the CopyOnWriteArrayList in another thread.
+Memory concurrency effects: As with other concurrent collections, actions in a thread prior to placing an object into a CopyOnWriteArrayList happen-before actions subsequent to the access or removal of that element from the CopyOnWriteArrayList in another thread.  
+
+---
 
 ## Underlying array
 ````
