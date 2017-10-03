@@ -1,0 +1,138 @@
+= Understanding Oauth
+:imagesdir: ./images/
+
+== What?
+OAuth is an authorization framework that enables a third-party application to obtain a limited access to an HTTP service.
+
+== OAuth & Login
+If *login* stands for _an employee accessing the building_, *OAuth* stands for _a guest receiving a visitor card and accessing the building_.
+
+. An external *Guest A* _says_ to the the reception desk that he _wants to meet_ *Employee B* for business purpose.
+. The *reception desk* _notifies_ *Employee B* that *Guest A* has _come to visit him_.
+. *Employee B* _comes_ to the reception desk and _identifies_ *Guest A*.
+. *Employee B* _records_ the business purpose and identity of Guest A at the reception desk.
+. The *reception desk* _issues_ a visitor card to *Guest A*.
+. *Employee B* and *Guest A* _go_ to the specified room to discuss their business.
+
+.Key OAuth 1.0 Terminology
+|=====
+|Terminology|Description
+|User| A user who has an account of the Service Provider and tries to use the Consumer. (_An employee in our example._)
+|Service Provider | Service that provides Open API that uses OAuth.(_The reception desk in our example._)
+|Consumer | An application or web service that wants to use functions of the Service Provider through OAuth authentication. (_A guest_)
+|Request Token| A value that a Consumer uses to be authorized by the Service Provider after completing authorization, it is exchanged for an Access Token. (_The identity of the guest_)
+|Access Token| A value that contains a key for the Consumer to access the resource of the Service Provider. (_A visitor card_)
+|=====
+
+.OAuth 1.0a authentication process 
+image::Oauth_1.0_process.png[]
+
+.Compay Visit Process and OAuth Authentication Process
+|=====
+|Company Visit Process | OAuth Authentication Process
+|1. Guest A (an external guest) says to the reception desk that he wants to meet Employee B (an employee) for a business purpose. | Requesting for and issue Request Token.
+|2. The reception desk notified Employee B that Guest A has come to visit him. | Calling user authentication page.
+|3. Employee B comes to the reception desk and identifies Guest A. | User login completed.
+|4. Employee B records the business purpose and identity of Guest A at the reception desk. | Requesting for user authority and accepting the request
+|5. The reception desk issues a visitor card for Guest A. | Issuing Access Token
+|6. Employee B and Guest A go to the specified room for the business | Requesting service information by using Accessing Token.
+|=====
+
+== Request Token
+.Sample http request to get request token
+[code, HTTP]
+----
+GET http://nid.naver.com/naver.oauth?mode=req_req_token&
+oauth_callback=http://example.com/OAuthRequestToken.do&
+oauth_consumer_key=WEhGuJZWUasHg&
+oauth_nonce=zSs4RFI7lakpADpSsv&
+oauth_signature=wz9+ZO5OLUnTors7HlyaKat1Mo0=&
+oauth_signature_method=HMAC-SHA1&
+oauth_timestamp=1330442419&
+oauth_version=1.0 HTTP/1.1
+----
+
+.Parameters used to request the issuing of request token
+|=====
+|Parameter|Description
+|oauth_callback|Web address of a Consumer that will be redirected after the Service Provider completes authentication. If the consumer is not a web application and has to address to redirect, the lower-case Out Of Band ("oob") is used as the value.
+|oauth_consumer_key|A key value used by the Service Provider to distinguish the Consumer.
+|oauth_nonce|A certain string created temporarily by the Consumer. The oauth_timestamp value should be unique for a repeat request. This is to prevent malicious repetition of requests.
+|oauth_signature| A signature value of encrypts and encodes the OAuth authentication information. The OAuth authentication information is a concatenated string value of other parameters except oauth_signature itself and the HTTP request method. The encryption meothod is defined in oauth_signature_method.
+|oauth_signature_method|A method to encrypt oauth_signature. HMAC-SHA1 and HMAC-MD5 are available.
+|oauth_timestamp|A timestamp when the request was generated. It is the accumulated time in seconds counted from 00:00:00 on January 1, 1970.
+|oauth_version|OAuth version. 1.0a is described as 1.0.
+|=====
+
+After this request, Service Provider passes new *oauth_token* and *oauth_verifier* to the Consumer. The next step is to request the access token.
+
+== Access Token
+
+.OAuth parameters to request issuing of access token
+|=====
+|Parameter|Description
+|oauth_consumer_key|A key value used by the Service Provider to distinguish the Consumer.
+|oauth_nonce|A certain string created temporarily by the Consumer. The oauth_timestamp value should be unique for a repeat request. This is to prevent malicious repetition of requests.
+|oauth_signature| A signature value of encrypts and encodes the OAuth authentication information. The OAuth authentication information is a concatenated string value of other parameters except oauth_signature itself and the HTTP request method. The encryption meothod is defined in oauth_signature_method.
+|oauth_signature_method|A method to encrypt oauth_signature. HMAC-SHA1 and HMAC-MD5 are available.
+|oauth_timestamp|A timestamp when the request was generated. It is the accumulated time in seconds counted from 00:00:00 on January 1, 1970.
+|oauth_version|OAuth version. 1.0a is described as 1.0.
+|oauth_verifier|The oauth_verifier value passed through oauth_callback when requesting the Request Token.
+|oauth_token|The oauth_token value passed through oauth_callback when requesting the Request Token.
+|=====
+After this request, oauth_token and oauth_token_sceret are returned. Depending on the Service Provider, the user ID or profile may be returned.
+
+== Using access token
+.Sample code
+[code, HTTP]
+----
+POST /cafe/getMenuList.xml HTTP/1.1
+Authorization: OAuth oauth_consumer_key="dpf43f3p2l4k3l03",
+    oauth_token="nSDFh734d00sl2jdk",
+    oauth_signature_method="HMACSHA1",
+    oauth_timestamp="1379123202",
+    oauth_nonce="csrrkjsd0OUhja",
+    oauth_signature="MdpQcU8iPGGhytrSoN%2FUDMsK2sui9I%3D"
+Accept-Encoding: gzip, deflate
+Connection: Keep-Alive
+Host: http://openapi.naver.com
+----
+
+.OAuth Parameters required to call open APIs using the Access Token
+|=====
+|Parameter|Description
+|oauth_consumer_key|A key value used by the Service Provider to distinguish the Consumer.
+|oauth_nonce|A certain string created temporarily by the Consumer. The oauth_timestamp value should be unique for a repeat request. This is to prevent malicious repetition of requests.
+|oauth_signature| A signature value of encrypts and encodes the OAuth authentication information. The OAuth authentication information is a concatenated string value of other parameters except oauth_signature itself and the HTTP request method. The encryption meothod is defined in oauth_signature_method.
+|oauth_signature_method|A method to encrypt oauth_signature. HMAC-SHA1 and HMAC-MD5 are available.
+|oauth_timestamp|A timestamp when the request was generated. It is the accumulated time in seconds counted from 00:00:00 on January 1, 1970.
+|oauth_version|OAuth version. 1.0a is described as 1.0.
+|oauth_token|The oauth_token value passed through oauth_callback when requesting the Request Token.
+|=====
+
+*Caution* +
+_When a request is made using Access Token, some Service Provider request the parameter *realm*. The *realm* is an optional parameter used by *WWW-Authenticate* HTTP header field._
+
+== Drawback of OAuth 1.0
+. Difficult to use if the application is not a web.
+. The procedure is too complicated to produce the OAuth implementation library.
+. The complicated procedure causes and operational burden upon the Service Provider.
+
+== OAuth 2.0
+. Enhanced support for applications, not for web applications
+. Does not need encryption +
+Uses HTTPS, not HMAC.
+. Simplified signature +
+Do not need sorting and URL encoding.
+. Access token update +
+When Access Token was issued in OAuth 1.0, the Access Token was valid continuously. For Twitter, Access Token does not expire. For Higher security, OAuth 2.0 allows to specify the life time of the Access Token.
+
+.OAuth 2.0 authentication process
+image::oauth2_flow.png[]
+
+<1> The flow starts by the application redirecting the user to the provider’s authorization URL. Here the provider displays a web page asking the user if he or she wishes to grant the application access to read and update their data.
+<2> The user agrees to grant the application access.
+<3> The service provider redirects the user back to the application (via the redirect URI), passing an authorization code as a parameter.
+<4> The application exchanges the authorization code for an access grant.
+<5> The service provider issues the access grant to the application. The grant includes an access token and a refresh token. One receipt of these tokens, the "OAuth dance" is complete.
+<6> The application uses the *AccessGrant* to establish a connection between the local user account and the external provider account. With the connection established, the application can now obtain a reference to the Service API and invoke the provider on behalf of the user.
