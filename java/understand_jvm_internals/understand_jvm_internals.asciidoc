@@ -1,0 +1,93 @@
+= Understand JVM Internals
+:imagesdir: ./images/
+
+== Virtual Machine
+*A virtual machine* is a software implementation of a machine(i.e. a computer) that executes programs like a physical machine.
+The features of JVM are as follows:
+
+* *Stack-based virtual machine* +
+The most popular computer architectures such as Intel x86 Architecture and ARM Architecture run based on a _register_. However, JVM runs based on a stack.
+* *Symbolic references* + 
+All types (class and interface) except for primitive data types are referred to through symbolic reference, instead of through explicit memory address-based reference.
+* *Garbage collection* +
+A class instance is explicitly created by the user code and automatically destroyed by garbage collection.
+* *Guarantee platform independence by clearly defining the primitive data type* +
+A traditional language such as C/C++ has different int type size according to the platform. The JVM clearly defines the primitive data type to maintain its compatibility and guarantee platform independence.
+* *Network byte order(big-endian)* + 
+
+== When will a string be garbage collected in java
+1. It is String literals that get automatically interned/added to the String pool. String that are created by application are not interned.. unless your application explicitly calls _String.intern()_.
+2. Infact, the rules for garbage collecting objects in the String pool are the same as for other Strings/other objects. The strings will garbage collected if they ever become unreachable. +
+
+In fact, the String objects that correspond to String literals typically are not candidates for garbage collection. This is because there is an implicit reference to the string object in the code of every method that uses the literal. This means that the String is reachable for as long as the method could be executed. +
+However, this is not always the case. If the literal was defined in a class that was dynamically loaded(i.e. using Class.forName(...)), then is is possible to arrange the class is unloaded. If that happens, then the String object for literal will e unreachable, and will be reclaimed when the heap containing the interned String get GC'ed.
+
+== Class file format
+
+[code, exception]
+----
+Servlet.service() for servlet jsp threw exception org.apache.jasper.JasperException: Unable to compile class for JSP Generated 
+servlet error:
+The code of method _jspService(HttpServletRequest, HttpServletResponse) is exceeding the 65535 bytes limit"
+----
+*Reasons*
+The 65535 byte limit is one of the JVM limitations, and stipulates that the size of one method cannot be more than 65535 bytes.
+
+The branch/jump instructions used in the Java Bytecode are "goto" and "jsr".
+[code, assemble]
+----
+goto [branchbyte1] [branchbyte2]
+jsr [branchbyte1] [branchbyte2]
+----
+To support more sufficient branch, Java Bytecode prepares "goto_w" and "jsr_w" that receive 4-byte signed branch offset.
+[code, assemble]
+----
+goto_w [branchbyte1] [branchbyte2] [branchbyte3] [branchbyte4]
+jsr_w [branchbyte1] [branchbyte2] [branchbyte3] [branchbyte4]
+----
+However, due to various other limits of the Java class file format, the Java method still cannot exceed 65535 bytes. 
+
+.The outline of a java class file
+[code, C]
+----
+ClassFile {
+    u4 magic;
+    u2 minor_version;
+    u2 major_version;
+    u2 constant_pool_count;
+    cp_info constant_pool[constant_pool_count-1];
+    u2 access_flags;
+    u2 this_class;
+    u2 super_class;
+    u2 interfaces_count;
+    u2 interfaces[interfaces_count];
+    u2 fields_count;
+    field_info fields[fields_count];
+    u2 methods_count;
+    method_info methods[methods_count];
+    u2 attributes_count;
+    attribute_info attributes[attributes_count];
+}
+----
+[quote]
+_________________
+What will happen if an incorrect class file is created because of a Java compiler error? Or, what if due to errors in network transfer or file copy process, a class file can be broken?
+_________________
+To prepare for such cases, the Java class loader is verified through a very strict and tight process. The JVM specifications explicitly detail the process.
+
+== JVM Structure
+.Java code execution process
+image::java_code_execution_process.png[]
+
+=== Class Loader
+* *Hierarchy structure*
+* *Delegation mode*
+* *Visibility limit*
+* *Unload is not allowed*
+
+.Class loader delegation model
+image::class_loader_delegation_model.png[]
+
+.Class load stage
+image::class_load_stage.png[]
+

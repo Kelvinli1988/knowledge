@@ -1,0 +1,34 @@
+= Stack based vs Register based Virtual Machine Architecture
+:imagesdir: ./images/
+
+A virtual machine (VM) is a high level abstraction on top of the native operating system, that emulates a physical machine.
+
+What should a virtual machine generally implement?
+It should emulate the operations carried out by a physical CPU and thus should ideally encompass the following comcepts: 
+
+* Compilation of source language into VM specific bytecode
+* Data structures to contain instructions and operands (the data instructions process)
+* A call stack for function call operations
+* An 'Instruction Pointer' (IP) pointing to the next instruction to execute
+* A virtual CPU - the instruction dispatcher that
+** Fetches the next instruction(address by the instruction pointer)
+** Decodes the operands
+** Executes the instruction
+
+== Stack based virtual machine
+image::stackadd.png[]
+[code, assemble]
+----
+1. POP 20
+2. POP 7
+3. ADD 20,7,result
+4. PUSH result
+----
+
+== Register based virtual machine
+image::registeradd.png[]
+[code, assemble]
+----
+1. ADD R1, R2, R3 ;        # Add contents of R1 and R2, store result in R3
+----
+
