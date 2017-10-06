@@ -91,3 +91,46 @@ image::class_loader_delegation_model.png[]
 .Class load stage
 image::class_load_stage.png[]
 
+=== Runtime data areas
+.Runtime data areas configuration
+image::run_time_data_area.png[]
+
+* *PC register* One PC (Program Counter) register exists for one thread, and is created when the thread starts. PC register has the address of a JVM instruction being executed now.
+* *JVM stack*
+** Stack frame: The size of local variable array and Operand stack is determined while compiling. Therefore, the size of stack frame is fixed according to the method.
+** Local varialbe array: It has an index starting from 0. 0 is the reference of a class instance where the method belongs. From 1, the parameters sent to the method are saved. After the method parameters, the local variables of the method are saved.
+** Operand stack: An actual workspace of a method. Each method exchanges data between the Operand stack and the local variable array, and pushes or pops other method invoke results. The necessary size of the Operand stack space can be determined during compiling. Therefore, the size of the Operand stack can also be determined during compiling.
+
+.JVM stack configuration
+image::jvm_stack.png[]
+
+* *Native method stack* A stack for native code written in a language other than java. In other words, it is a stack used to execute C/C++ codes invoked through JNI(Java Native Interface). According to the language, a C stack or C++ stack is created.
+* *Method Area* The method area can be implemented in various formats by JVM vendor. Oracle Hotspot JVM calls it Permanent Area or Permanent Generation (PermGen). The garbage collection for the method area is optional for each JVM vendor.
+* *Runtime constant pool* 
+* *Heap*
+
+=== Execution engine
+
+* *Interpreter* Reads, interprets and executes the bytecode instructions one by one. As it interprets and executes instructions one by one, it can quickly interpret one bytecode, but slowly executes the interpreted result. This is the disadvantage of the interpret language. The 'language' called Bytecode basically runs like an interpreter.
+* *JIT(Just-In-Time) compiler* The JIT compiler has been introduced to compensate for the disadvantages of the interpreter. The execution engine runs as an interpreter first, and at the appropriate time, the JIT compiler compiles the entire bytecode to change it to native code. After that, the execution engine no longer interprets the method, but directly executes using native code. Execution in native code is much faster than interpreting instructions one by one. The compiled code can be executed quickly since the native code is stored in the cache. 
+
+.Java Compiler and JIT Compiler
+image::java_compiler_jit.png[]
+How the execution engine runs is not defined in the JVM specifications. Therefor, JVM vendors improve their execution engines using various techiniques, and introduce various types of JIT compilers.
+image::jit_compiler.png[]
+The JIT compiler converts the bytecode to an intermediate-level expression, IR(Intermdeidate Representation), to execute optimization, and then converts the expression to native code.
+
+==== Hotspot Compiler
+Oracle Hotspot VM uses a JIT compiler called Hotspot Compiler. It is called Hotspot because Hotspot Compiler searches the 'Hotspot' that requires compiling with the hightest priority through profiling, and then it compiles the hotspot to native code. If the method that has the bytecode compiled is no longer frequently invoked, in other words, if themethod is not the hotspot any more, the Hotspot VM removes the native code from *the cache* and runs in interpreter mode.
+The Hotspot VM is divided into the Server VM and the Client VM, which use different JIT compilers.
+image::vms.png[]
+* Identical runtime
+* Different JIT compilers
+
+Advanced Dynamic Optimizing Compiler used by the server VM uses more complex and diverse performance optimization techiniques.
+
+==== AOT(Ahead-Of-Time) Compiler
+Introduced by IBM from IBM JDK 6. The code has been already compiled througth the AOT compiler can be used by another JVM without compiling. 
+IBM JVM provides a fast way of execution by precompiling code to JXE(Java EXecutable) file format using AOT compiler.
+
+*The biggest difference between the initial JVM and the latest JVM is the execution engine.*
