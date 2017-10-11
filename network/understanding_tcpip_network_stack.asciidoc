@@ -1,0 +1,21 @@
+= Understanding TCP/IP Network Stack
+:imagesdir: ./images/
+
+== Key Charasteristics of TCP/IP
+
+. Connection-oriented
+. Bidirectional Byte Stream
+. In-order Delivery
+. Reliability through ACK
+. Flow Control
+. Congestion Control
+
+== Data Transmission
+
+.Operation process by each layer of TCP/IP network stack for data transmission
+image::data_transmission_1.png[]
+Layers classified into three areas:
+. User area
+. Kernel area
+. Device area
+Tasks at the user area and the kernel area are performed by the CPU, called *host*. _Network Interface Card_ (NIC) is to handle device area.

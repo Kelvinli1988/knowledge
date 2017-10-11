@@ -1,0 +1,70 @@
+= An Introduction To R
+:imagedir: ./images
+
+== Simple manipulations; number and vectors
+
+=== Vector and assignment
+R operates on named _data structures_. To create a vector:
+[code, R]
+----
+> x <- c(10.4, 5.6, 3.1, 6.4, 21.7)
+----
+Other assignments:
+[code, R]
+----
+> assign("x", c(10.4, 5.6, 3.1, 6.4, 21.7))
+> c(10.4, 5.6, 3.1, 6.4, 21.7) -> x
+----
+Furhter assignment would create another vector with 11 entries.
+[code, R]
+----
+> y <- c(x, 0, x)
+----
+
+=== Vector arithmetic
+Vectors can be used in arithmetic expressions, in which case the operations are performed element by element. Vectors occurring in the same expression need *not* all be of the same length. If they are not, the value of the expression is a vector with the same length as the longest vector which occurs in the expression. Shorter vectors in the expression are recycled as often as need be (perhaps fractionally) until they match the length of the longest vector.
+
+The elementary arithmetic operators are the usual +, -, \*, / and \^ for raising to a power. +
+
+range(x) is equal with c(min(x), max(x)). +
+length(x) is the number of elements in x +
+sum(x) gives the total of the elements in x +
+prod(x) gives their product +
+mean(x) is sum(x)/length(x) +
+var(x) is sum( (x-mean(x) )^2)/(length(x)-1) +
+sort(x) returns a vector of the same size as x with the elements arranged in increasing order +
+
+=== Generating regular sequences
+req() parameters:
+1. from
+2. to
+3. by
+4. length
+5. along
+[code, R]
+----
+> seq(from=1, to=3) => [1,2,3]
+> seq(from=1, to=10, by=2) => [1, 3, 5, 7, 9]
+> seq(to=9, by=2, length=5) => [1, 3, 5, 7, 9]
+> x <- c(1, 3, 5)
+> seq(from=2, by=2, along=x) => [2,4,6]
+----
+
+=== Logical vectors
+The element of a logical vector can have the values TRUE, FALSE, and NA("not available").
+When logical vectors is coerced into numeric vectors, FALSE becoming 0 and TRUE becoming 1.
+
+=== Missing values
+
+The function is.na(x) gives a logical vector of the same size as x with value TRUE if and only if the corresponding element in x is NA. +
+NA => not available +
+NAN => not a number +
+Inf - Inf => NAN
+
+is.na(x) <=> is.nan(x)
+
+=== Character vectors
+
+== Objects their modes and attributes
+=== Intrinsic attributes: nmode and length
+The entities R operates on are technically known as objects.
